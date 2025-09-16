@@ -1,0 +1,121 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.5'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'groovy'
+    id 'org.liquibase.gradle' version '2.2.2'
+}
+
+group = 'api.expenses'
+version = '1.0.0'
+
+java {
+	sourceCompatibility = '21'
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+
+    //Aspectos
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
+    //WebSocket
+    implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+    //Cache
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
+    implementation 'com.github.ben-manes.caffeine:caffeine'
+
+	//DB + JPA
+    runtimeOnly 'mysql:mysql-connector-java:8.0.33'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+    //liquibase
+    liquibaseRuntime 'org.liquibase:liquibase-core'
+    liquibaseRuntime 'info.picocli:picocli:4.7.6'
+    liquibaseRuntime 'mysql:mysql-connector-java:8.0.33'
+    testImplementation 'org.liquibase:liquibase-core'
+
+	//Mapper + Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	compileOnly 'org.mapstruct:mapstruct:1.6.3'
+	annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+	testAnnotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
+
+    //Grafana
+    implementation 'io.micrometer:micrometer-registry-prometheus'
+
+    //Pdf Reader
+    implementation("org.apache.pdfbox:pdfbox:2.0.32")
+
+    //Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-authorization-server'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+
+
+
+    //Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.boot:spring-boot-testcontainers'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation 'org.spockframework:spock-core:2.4-M6-groovy-4.0'
+	testImplementation 'org.spockframework:spock-spring:2.4-M6-groovy-4.0'
+
+	testImplementation('com.athaydes:spock-reports:2.5.1-groovy-4.0') {
+		transitive = false
+	}
+
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+	systemProperty "file.encoding", "utf-8"
+	maxParallelForks = Runtime.runtime.availableProcessors()
+}
+tasks.register('printVersion') {
+	doLast {
+		print project.version
+	}
+}
+tasks.withType(Test).configureEach {
+	reports.html.required = false
+	reports.junitXml.required = false
+}
+
+springBoot {
+	buildInfo()
+}
+
+liquibase {
+    def dbName = System.properties['dbName'] ?: 'expenses'
+    activities {
+        main {
+            changeLogFile 'build.migrations/db/changelog.xml'
+            url "jdbc:mysql://192.168.1.100:3306/$dbName"
+            username 'root'
+            password 'helios'
+        }
+    }
+}
