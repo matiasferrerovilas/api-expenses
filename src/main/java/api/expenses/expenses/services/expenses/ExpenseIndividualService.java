@@ -49,6 +49,6 @@ public class ExpenseIndividualService {
 
     public Page<Gasto> getExpensesBy(PaymentMethodEnum paymentMethod, Long currencyId, BanksEnum bank, LocalDate date,Pageable page) {
         var user = userService.getLoggedInUserEmail();
-        return expenseRepository.getExpenseBy(user, currencyId, bank, paymentMethod, page);
+        return expenseRepository.getExpenseBy(user, currencyId, bank, paymentMethod,date, page);
     }
 }

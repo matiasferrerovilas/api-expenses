@@ -66,12 +66,6 @@ CREATE TABLE gastos (
                             FOREIGN KEY (currency_id) REFERENCES currency(id)
                                 ON DELETE RESTRICT ON UPDATE CASCADE,
 
-                        CONSTRAINT chk_credito_cuotas
-                            CHECK (
-                                (tipo_gasto != 'CREDITO') OR
-                                (cuota_actual > 0 AND cuotas_totales > 0 AND cuota_actual <= cuotas_totales)
-                                ),
-
                         CONSTRAINT chk_debito_cuotas_null
                             CHECK (
                                 (tipo_gasto != 'DEBITO') OR

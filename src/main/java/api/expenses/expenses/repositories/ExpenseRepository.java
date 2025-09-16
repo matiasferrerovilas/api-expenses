@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Repository
@@ -34,7 +35,9 @@ public interface ExpenseRepository extends JpaRepository<Gasto, Long> {
                     AND (:bank IS NULL OR g.bank = :bank)
                     AND (:currencyId IS NULL OR g.currency.id = :currencyId)
                     AND (:user IS NULL OR g.user = :user)
+                    AND (:date IS NULL OR g.year = YEAR(:date) AND g.month = MONTH(:date))
                     AND (:paymentMethod IS NULL OR g.type = :paymentMethod)
+            ORDER BY g.dateTime DESC
             """)
-    Page<Gasto> getExpenseBy(String user, Long currencyId, BanksEnum bank, PaymentMethodEnum paymentMethod, Pageable page);
+    Page<Gasto> getExpenseBy(String user, Long currencyId, BanksEnum bank, PaymentMethodEnum paymentMethod, LocalDate date,Pageable page);
 }
